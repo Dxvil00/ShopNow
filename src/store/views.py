@@ -322,6 +322,8 @@ def change_password_view(request):
             if not password_have_error:
                 user.set_password(new_password)
                 user.save()
+                
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
                 login(request, user)
                 return redirect("profile-page")
         else:
