@@ -11,6 +11,7 @@ import uuid
 from django.utils import timezone
 import random
 from datetime import timedelta
+from django.utils.crypto import get_random_string
 
 
 def generate_payment_id():
@@ -243,11 +244,14 @@ class PaymentMethod(models.Model):
 
 class PasswordReset(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    reset_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    reset_id = models.UUIDField(default=uuid.uuid4, unique=True)
+    code = models.CharField(max_length=6, blank=True)  # 6-digit code for example
     created_when = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Password reset for {self.user.username} at {self.created_when}"
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = get_random_string(length=6, allowed_chars='0123456789')
+        super().save(*args, **kwargs)
 
 
 class ShippingAddress(models.Model):

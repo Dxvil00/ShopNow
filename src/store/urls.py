@@ -52,4 +52,5 @@ urlpatterns = [
     path('forgot-password/', views.forgot_password, name='forgot-password'),
     path('password-reset-sent/<str:reset_id>/', views.password_reset_sent, name='password-reset-sent'),
     path('reset-password/<str:reset_id>/', views.reset_password, name='reset-password'),
+    path('enter-reset-code/', views.enter_reset_code, name='enter-reset-code'),
 ]

@@ -19,10 +19,12 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib import messages
 from django.utils import timezone
+from django.conf import settings
 from django.urls import reverse
 from main import settings
 from . import models
 import pycountry
+import requests
 import hashlib
 
 
@@ -172,8 +174,30 @@ def logout_view(request):
     return redirect("store_home")
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def forgot_password(request):
     if request.method == "POST":
+        recaptcha_response = request.POST.get('g-recaptcha-response')
+        data = {
+            'secret': settings.RECAPTCHA_SECRET_KEY,
+            'response': recaptcha_response,
+            'remoteip': get_client_ip(request),
+        }
+        r = requests.post('https://www.google.com/recaptcha/api/siteverify', data=data)
+        result = r.json()
+
+        if not result.get('success'):
+            messages.error(request, "Invalid reCAPTCHA. Please try again.", extra_tags="forgot-pass-msg")
+            return redirect('forgot-password')
+        
         email = request.POST.get("email")
 
         try:
@@ -182,49 +206,65 @@ def forgot_password(request):
             new_password_reset = models.PasswordReset(user=user)
             new_password_reset.save()
 
-            password_reset_url = reverse(
-                "reset-password", kwargs={"reset_id": str(new_password_reset.reset_id)}
-            )
-            full_password_reset_url = (
-                f"{request.scheme}://{request.get_host()}{password_reset_url}"
-            )
-
             email_body = render_to_string(
-                "store/emails/password_reset_email.html", {"reset_url": full_password_reset_url}
+                "store/emails/password_reset_code_email.html",  # update this template
+                {"reset_code": new_password_reset.code}
             )
 
-            email_message = EmailMessage(
-                "Reset your password",
-                email_body,
+            from django.core.mail import EmailMultiAlternatives
+            email_message = EmailMultiAlternatives(
+                "Your Password Reset Code",
+                f"Your reset code is {new_password_reset.code}.",
                 f"ShopNow <{settings.EMAIL_HOST_USER}>",
-                [email],  # Receiver's email
+                [email],
             )
-
-            email_message.content_subtype = "html"
-
+            email_message.attach_alternative(email_body, "text/html")
             email_message.send(fail_silently=False)
 
-            return redirect("password-reset-sent", reset_id=new_password_reset.reset_id)
+            return redirect("enter-reset-code")
 
         except User.DoesNotExist:
-            messages.error(
-                request,
-                f"No user with email '{email}' found",
-                extra_tags="forgot-pass-msg",
-            )
+            messages.error(request, f"No user with email '{email}' found", extra_tags="forgot-pass-msg")
             return redirect("forgot-password")
         except Exception as e:
-            # Catch other errors (e.g., email failure)
-            messages.error(
-                request, f"An error occurred: {str(e)}", extra_tags="forgot-pass-msg"
-            )
+            messages.error(request, f"An error occurred: {str(e)}", extra_tags="forgot-pass-msg")
             return redirect("forgot-password")
 
     return render(
         request,
         "store/authentication-page/reset-password/forgot-password.html",
-        {"hide_login_modal": True},
+        {"hide_login_modal": True, "recaptcha_site_key": settings.RECAPTCHA_SITE_KEY,},
     )
+
+
+def enter_reset_code(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        code = request.POST.get("reset_code")
+
+        if not code or not code.isdigit() or len(code) != 6:
+            messages.error(request, "Reset code must be a 6-digit number.", extra_tags="reset-code-msg")
+            return redirect("enter-reset-code")
+
+        try:
+            user = User.objects.get(email__iexact=email)
+            reset_entry = models.PasswordReset.objects.get(user=user, code=code)
+
+            # Check expiration
+            expiration_time = reset_entry.created_when + timezone.timedelta(minutes=10)
+            if timezone.now() > expiration_time:
+                reset_entry.delete()
+                messages.error(request, "Reset code has expired.", extra_tags="reset-code-msg")
+                return redirect("forgot-password")
+
+            # Redirect user to reset password page with reset_id
+            return redirect("reset-password", reset_id=str(reset_entry.reset_id))
+
+        except (User.DoesNotExist, models.PasswordReset.DoesNotExist):
+            messages.error(request, "Invalid email or reset code.", extra_tags="reset-code-msg")
+            return redirect("enter-reset-code")
+
+    return render(request, "store/authentication-page/reset-password/password-reset-sent.html")
 
 
 def password_reset_sent(request, reset_id):
@@ -289,8 +329,10 @@ def reset_password(request, reset_id):
     return render(
         request,
         "store/authentication-page/reset-password/reset-password.html",
-        {"reset_id": str(reset_entry.reset_id)},
-        {"hide_login_modal": True},
+        {
+            "reset_id": str(reset_entry.reset_id),
+            "hide_login_modal": True,
+        },
     )
 
 
