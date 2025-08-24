@@ -14,12 +14,11 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 # Security Settings
 SECRET_KEY = config('SECRET_KEY')
-DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = ['*', 'localhost']
+DEBUG = True#config('DEBUG', default=True, cast=bool)
+ALLOWED_HOSTS = ['*']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
-# SECURE_SSL_REDIRECT = True  # Uncomment for production
 
 # Application Definition
 INSTALLED_APPS = [
@@ -34,7 +33,6 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.facebook',
 
     'store',
 ]
@@ -58,11 +56,11 @@ WSGI_APPLICATION = 'main.wsgi.application'
 
 # Database Configuration
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
-    'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+    # 'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
 }
 
 # Authentication Backends
@@ -87,8 +85,13 @@ USE_TZ = True
 
 # Static and Media Files
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+if DEBUG:
+    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+else:
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -114,15 +117,6 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         'SCOPE': ['profile', 'email'],
     },
-    'facebook': {
-        'APP': {
-            'client_id': os.getenv('QAUTH_FACEBOOK_CLIENT_ID'),
-            'secret': os.getenv('QAUTH_FACEBOOK_SECRET'),
-        },
-        'AUTH_PARAMS': {'auth_type': 'reauthenticate'},
-        'SCOPE': ['email'],
-        'FIELDS': ['email', 'name'],
-    },
 }
 
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -136,9 +130,9 @@ ACCOUNT_SIGNUP_FIELDS = []
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_EMAIL_UNIQUE = True
-SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
-SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
-SECURE_SSL_REDIRECT = True #Ensure all traffic is redirected to HTTPS
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True #Ensure all traffic is redirected to HTTPS
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
@@ -173,10 +167,10 @@ MESSAGE_TAGS = {
 }
 
 # CSRF Trusted Origins
-CSRF_TRUSTED_ORIGINS = [
-    "https://shopnow-15z0.onrender.com",
-    # "https://localhost:8000/",
-]
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        "https://shopnow-15z0.onrender.com",
+    ]
 
 # Default Primary Key Field Type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
