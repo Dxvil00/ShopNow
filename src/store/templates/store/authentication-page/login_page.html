@@ -79,11 +79,6 @@
               <i class="fab fa-google"></i> Login with Google
             </a>
           </div>
-          <div class="d-grid mb-3">
-            <a href="{% provider_login_url 'facebook' %}" class="btn btn-outline-dark d-flex align-items-center justify-content-center gap-2">
-              <i class="fab fa-facebook-f"></i> Login with Facebook
-            </a>
-          </div>
 
           <div class="text-center small">
             Don’t have an account?
@@ -95,7 +90,7 @@
 
     <!-- Right Image Panel -->
     <div class="col-lg-6 d-none d-lg-block position-relative p-0">
-      <img src="{% static 'media/login-bg.jpg' %}" alt="Image" class="img-fluid w-100 h-100 object-fit-cover"
+      <img src="{% static 'images/login-bg.jpg' %}" alt="Image" class="img-fluid w-100 h-100 object-fit-cover"
            onerror="this.onerror=null;this.src='https://placehold.co/600x600.png';">
       <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-25 d-dark-block"></div>
     </div>
