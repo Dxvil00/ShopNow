@@ -950,6 +950,13 @@ def search_product(request):
     products = []
     query = ""
 
+    address = None
+    if request.user.is_authenticated:
+        try:
+            address = models.ShippingAddress.objects.get(user=request.user)
+        except models.ShippingAddress.DoesNotExist:
+            pass
+
     if request.method == "POST":
         query = request.POST.get("query", "")
 
@@ -962,7 +969,11 @@ def search_product(request):
                 if category:
                     products = models.Product.objects.filter(category=category)
 
-    context = {"products": products, "query": query}
+    context = {
+        "products": products, 
+        "query": query,
+        "user_address": address,
+    }
     return render(request, "store/search-results.html", context)
 
 
