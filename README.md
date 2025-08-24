@@ -366,6 +366,49 @@ We welcome contributions! Please follow these steps:
 
 ---
 
+## 👥 Contributors
+
+<div align="center">
+
+### 🏆 Project Creators & Maintainers
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/Huerte">
+        <img src="https://github.com/Huerte.png" width="100px;" alt="Huerte"/>
+        <br />
+        <sub><b>!HuerteDev</b></sub>
+      </a>
+      <br />
+      <sub>🚀 Full Stack Developer</sub>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Venomous-pie">
+        <img src="https://github.com/Venomous-pie.png" width="100px;" alt="Venomous-pie"/>
+        <br />
+        <sub><b>dedicatoriaDev</b></sub>
+      </a>
+      <br />
+      <sub>🚀 Full Stack Developer</sub>
+    </td>
+  </tr>
+</table>
+
+---
+
+### 🤝 Want to Contribute?
+
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) to get started.
+
+[![Contributors](https://img.shields.io/github/contributors/Huerte/ShopNow?style=for-the-badge&color=blue)](https://github.com/Huerte/ShopNow/graphs/contributors)
+[![Forks](https://img.shields.io/github/forks/Huerte/ShopNow?style=for-the-badge&color=green)](https://github.com/Huerte/ShopNow/network/members)
+[![Stars](https://img.shields.io/github/stars/Huerte/ShopNow?style=for-the-badge&color=yellow)](https://github.com/Huerte/ShopNow/stargazers)
+[![Issues](https://img.shields.io/github/issues/Huerte/ShopNow?style=for-the-badge&color=red)](https://github.com/Huerte/ShopNow/issues)
+
+</div>
+
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
