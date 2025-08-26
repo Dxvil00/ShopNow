@@ -1,8 +1,19 @@
 # 🛒 ShopNow - Modern E-Commerce Platform
 
-A full-featured e-commerce web application built with Django, featuring a modern responsive design, comprehensive user management, and advanced shopping features.
+<div align="center">
 
 ![ShopNow Homepage](docs/screenshots/Screenshot%20(220).png)
+
+**A full-featured e-commerce web application built with Django, featuring a modern responsive design, comprehensive user management, and advanced shopping features.**
+
+[![Python](https://img.shields.io/badge/Python-3.8+-blue?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![Django](https://img.shields.io/badge/Django-5.2.4-green?style=for-the-badge&logo=django&logoColor=white)](https://djangoproject.com)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.7-purple?style=for-the-badge&logo=bootstrap&logoColor=white)](https://getbootstrap.com)
+
+[![SQLite](https://img.shields.io/badge/SQLite-3-lightgrey?style=for-the-badge&logo=sqlite&logoColor=white)](https://sqlite.org)
+[![License](https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge)](LICENSE)
+
+</div>
 
 ## 📋 Table of Contents
 
